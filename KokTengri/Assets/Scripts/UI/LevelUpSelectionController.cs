@@ -230,7 +230,7 @@ namespace KokTengri.UI
         {
             EnsureWidgetArray();
 
-            IReadOnlyList<SpellSlotManager.SpellSlotEntry> ownedSpells = _spellSlots.GetAllSpells();
+            IReadOnlyList<SpellSlotEntry> ownedSpells = _spellSlots.GetAllSpells();
             List<ElementType> availableElements = new List<ElementType>(ElementPool);
             int visibleCardCount = Mathf.Min(GetOptionsPerLevelUp(), _cardWidgets.Length, _activeCards.Length, availableElements.Count);
 
@@ -335,7 +335,7 @@ namespace KokTengri.UI
             };
         }
 
-        private bool HasOnlyMaxedSpellMatches(ElementType selectedElement, IReadOnlyList<SpellSlotManager.SpellSlotEntry> ownedSpells)
+        private bool HasOnlyMaxedSpellMatches(ElementType selectedElement, IReadOnlyList<SpellSlotEntry> ownedSpells)
         {
             SpellCrafting.CraftingResult currentEvaluation = _spellCrafting.EvaluateSelection(selectedElement, ownedSpells, _spellSlots.MaxSlots);
             if (currentEvaluation.Type == CraftingResultType.NewSpell || currentEvaluation.Type == CraftingResultType.UpgradeSpell)
@@ -343,12 +343,12 @@ namespace KokTengri.UI
                 return false;
             }
 
-            List<SpellSlotManager.SpellSlotEntry> withoutMaxedSpells = new List<SpellSlotManager.SpellSlotEntry>(ownedSpells.Count);
+            List<SpellSlotEntry> withoutMaxedSpells = new List<SpellSlotEntry>(ownedSpells.Count);
             bool removedMaxedSpell = false;
 
             for (int i = 0; i < ownedSpells.Count; i++)
             {
-                SpellSlotManager.SpellSlotEntry ownedSpell = ownedSpells[i];
+                SpellSlotEntry ownedSpell = ownedSpells[i];
                 if (ownedSpell.Level >= 5)
                 {
                     removedMaxedSpell = true;
@@ -378,7 +378,7 @@ namespace KokTengri.UI
                 return;
             }
 
-            IReadOnlyList<SpellSlotManager.SpellSlotEntry> ownedSpells = _spellSlots.GetAllSpells();
+            IReadOnlyList<SpellSlotEntry> ownedSpells = _spellSlots.GetAllSpells();
             SpellCrafting.CraftingResult resolution = _spellCrafting.ProcessSelection(selectedOption.Element, ownedSpells, _spellSlots.MaxSlots);
 
             if (resolution.Type == CraftingResultType.InventoryFullNoMatch && !_discardEnabled)
@@ -798,7 +798,7 @@ namespace KokTengri.UI
         /// </summary>
         /// <param name="spells">The owned spell snapshot.</param>
         /// <param name="maxSlots">The maximum number of spell slots to render.</param>
-        public void Refresh(IReadOnlyList<SpellSlotManager.SpellSlotEntry> spells, int maxSlots)
+        public void Refresh(IReadOnlyList<SpellSlotEntry> spells, int maxSlots)
         {
             int labelCount = Mathf.Min(_slotLabels.Length, maxSlots);
 

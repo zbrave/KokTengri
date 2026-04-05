@@ -5,28 +5,29 @@ using KokTengri.Core;
 namespace KokTengri.Gameplay
 {
     /// <summary>
+    /// Runtime view of an occupied spell slot.
+    /// </summary>
+    [System.Serializable]
+    public struct SpellSlotEntry
+    {
+        public string SpellId;
+        public int Level;
+        public SpellKind Kind;
+
+        public SpellSlotEntry(string spellId, int level, SpellKind kind = default)
+        {
+            SpellId = spellId;
+            Level = level;
+            Kind = kind;
+        }
+    }
+
+    /// <summary>
     /// Fixed-size runtime container for crafted spells and their upgrade levels.
     /// </summary>
     public sealed class SpellSlotManager
     {
         private readonly SpellSlotEntry?[] _slots;
-
-        /// <summary>
-        /// Runtime view of an occupied spell slot.
-        /// </summary>
-        public struct SpellSlotEntry
-        {
-            public string SpellId;
-            public int Level;
-            public SpellKind Kind;
-
-            public SpellSlotEntry(string spellId, int level, SpellKind kind = default)
-            {
-                SpellId = spellId;
-                Level = level;
-                Kind = kind;
-            }
-        }
 
         public SpellSlotManager(int maxSlots = 6, int maxLevel = 5)
         {
