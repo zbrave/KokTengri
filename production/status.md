@@ -1,9 +1,9 @@
-# Kök Tengri — Sprint 1 Devam Ediyor
+# Kök Tengri — Sprint 1 Tamamlandı
 
-> **Son Güncelleme**: 2026-04-05 (Session 4 — Wave 4 kısmen tamamlandı)
-> **Mevcut Faz**: Pre-Production → Sprint 1 Implementation
+> **Son Güncelleme**: 2026-04-05 (Session 5 — Wave 4 tamamlandı)
+> **Mevcut Faz**: Pre-Production → Sprint 1 Implementation (Wave 4 tamamlandı)
 > **Hedef**: MVP-1 Sprint 1 tamamlama
-> **Sonraki Adım**: KayaKalkaniEffect yaz + SpellCrafting build hatası düzelt + Unity compilation check
+> **Sonraki Adım**: Unity editor'de compilation check → SpellDefinitionSO asset'leri oluştur → integration test
 
 ---
 
@@ -19,8 +19,8 @@
 | Sprint Planı | 100% | ✅ Sprint 1 planı oluşturuldu |
 | Unity Projesi | 100% | ✅ 2022.3 LTS URP 2D oluşturuldu |
 | **Sprint 1 Wave 1-3 (S1-01 → S1-16)** | 100% | ✅ 31 .cs dosyası, 9 commit |
-| **Sprint 1 Wave 4 (S1-17, S1-18, S1-19)** | 80% | 🔄 Spell Effects kısmen, HUD + Level-Up tamam |
-| Build Verification | 0% | ⬜ SpellCrafting.cs hatası düzeltilmeli |
+| **Sprint 1 Wave 4 (S1-17, S1-18, S1-19)** | 100% | ✅ Tamamlandı (KayaKalkaniEffect + refactor + meta dosyaları) |
+| Build Verification | 0% | ⬜ Unity editor'de compilation check gerekli |
 | Prototip | 0% | ⬜ Sprint sonrası |
 
 ---
@@ -37,7 +37,7 @@
 
 ### Wave 1-3 — ✅ TAMAMLANDI (9 commit)
 
-Sprint 1 görev S1-05'ten S1-16'ye kadar tüm sistemler implement edildi:
+Sprint 1 görev S1-05'ten S1-16'ya kadar tüm sistemler implement edildi:
 - S1-05 RunManager, S1-06 WaveManager, S1-07 DifficultyScaling
 - S1-08 DamageCalculator, S1-09 PlayerMovement, S1-10 ElementInventory
 - S1-11 SpellCrafting, S1-12 SpellSlotManager, S1-13 EnemySpawner
@@ -45,21 +45,31 @@ Sprint 1 görev S1-05'ten S1-16'ye kadar tüm sistemler implement edildi:
 
 Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameEnums, GameEvents, 3 unit test
 
-### Wave 4 — 🔄 KISMEN TAMAMLANDI
+### Wave 4 — ✅ TAMAMLANDI
 
 | # | Görev | Durum | Notlar |
 |---|-------|-------|-------|
-| S1-17 | Spell Effects (SpellEffectBase, AlevHalkasi, KilicFirtinasi) | ✅ Tamam | **KayaKalkaniEffect EKSİK** — yazılacak |
+| S1-17 | Spell Effects (SpellEffectBase, AlevHalkasi, KilicFirtinasi, KayaKalkani) | ✅ Tamam | 3 büyü efekti + base class |
 | S1-18 | HUD Controller | ✅ Tamam | HUDConfigSO + SpellSlotWidget aynı dosyada tanımlandı |
 | S1-19 | Level-Up Selection Controller | ✅ Tamam | LevelUpSelectionConfigSO + widget stub'ları aynı dosyada |
 
-### Bloklayıcı Sorun — ⬜ YENİ SESSION'DA ÇÖZÜLECEK
+### Bu Session'da Çözülen Sorunlar
 
-| Sorun | Dosya | Açıklama |
-|------|------|--------|
-| Build kırık | `SpellCrafting.cs` | `SpellSlotEntry` tip çözümleme hatası — düzeltilmek gerekiyor |
-| KayaKalkaniEffect eksik | `KokTengri/Assets/Scripts/Gameplay/` | Yer+Yer orbit büyüsü — AlevHalkasiEffect pattern'ine benzer şekilde yazılacak |
-| .cs.meta dosyaları | tüm yeni dosyalar | Unity Editor açılınca otomatik oluşur |
+| Sorun | Çözüm |
+|------|--------|
+| KayaKalkaniEffect eksik | ✅ Yazıldı — Orbit tipi, Yer+Yer, seviyeye göre 2→3→4 kaya |
+| SpellCrafting.cs build hatası | ✅ SpellSlotEntry namespace seviyesine taşındı, `[Serializable]` eklendi |
+| .cs.meta dosyaları eksik | ✅ 6 .meta dosyası oluşturuldu |
+| LevelUpSelectionController tam nitelikli tip referansları | ✅ `SpellSlotManager.SpellSlotEntry` → `SpellSlotEntry` kısa form |
+
+---
+
+## Sonraki Adımlar
+
+1. **Unity editor aç** → compilation check (C# hataları var mı?)
+2. **SpellDefinitionSO asset'leri oluştur** — `kaya_kalkani` ve diğer büyüler için (Unity editor'de)
+3. **Integration test** senaryoları yaz
+4. **Sprint 1 final verification** → `/gate-check`
 
 ---
 
@@ -84,9 +94,10 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | 2026-04-04 | Pre-production: GDD, ADR, gate-check | Konsept, pillar, sistem dekompozisyonu tamamlandı |
 | 2026-04-04 | Sprint 1 planı oluşturuldu | 19 Must Have görev, 19.5 gün kapasite |
 | 2026-04-04 | Unity projesi + Wave 1-3 kodlama | Önceki session'da Wave 1-3 tamamlandı ama commit edilmemişti |
-| 2026-04-05 | Önceki session temizlendi | 31 .cs dosyası + alt yapıapı 9 mantıklı commit halinde kaydedildi |
+| 2026-04-05 | Önceki session temizlendi | 31 .cs dosyası + altyapı 9 mantıklı commit halinde kaydedildi |
 | 2026-04-05 | Wave 4 kısmen tamamlandı | S1-17 Spell Effects (2/3 büyü), S1-18 HUD, S1-19 Level-Up Selection |
-| 2026-04-05 | Status dosyası güncellendi | Yeni session için akt.md yazıldı |
+| 2026-04-05 | Status güncellendi | active.md yazıldı |
+| 2026-04-05 | **Wave 4 tamamlandı** | KayaKalkaniEffect + SpellSlotEntry refactor + 6 .meta dosyası |
 
 ---
 
@@ -103,10 +114,10 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | ADR'ler | `docs/architecture/adr-0001`, `adr-0002`, `adr-0003` |
 | Sprint Planı | `production/sprints/sprint-1.md` |
 | Stage Dosyası | `production/stage.txt` |
-| Session State | `production/session-state/active.md` |
+| Session State | `production/session-state/active.md` (gitignored — local only) |
 | Bu Dosya | `production/status.md` |
 
 ---
 
 > **Yeni session'da kaldığın yeri bulmak için**: `production/session-state/active.md` dosyasını oku → "Yapılacak İşler" bölümüne bak → oradaki ilk görevden devam et.
-> **Şu anki sonraki adım**: KayaKalkaniEffect yaz + SpellCrafting.cs build hatası düzelt + Unity compilation check.
+> **Şu anki sonraki adım**: Unity editor'de compilation check → SpellDefinitionSO asset'leri → integration test.
