@@ -2,8 +2,16 @@
 
 ```text
 /
-├── CLAUDE.md                    # Master configuration
-├── .claude/                     # Agent definitions, skills, hooks, rules, docs
+├── AGENTS.md                    # OpenCode master configuration (primary)
+├── CLAUDE.md                    # Legacy Claude Code config (kept for compat)
+├── .claude/
+│   ├── agents/                  # 48 agent definitions
+│   ├── skills/                  # 37 slash commands
+│   ├── hooks/                   # Legacy hook scripts (bash + PowerShell)
+│   ├── rules/                   # Legacy path-scoped rules (reference only)
+│   ├── docs/                    # Documentation and templates
+│   ├── hookify.*.local.md       # Hookify validation rules (active)
+│   └── settings.json            # Legacy Claude Code settings
 ├── src/                         # Game source code (core, gameplay, ai, networking, ui, tools)
 ├── assets/                      # Game assets (art, audio, vfx, shaders, data)
 ├── design/                      # Game design documents (gdd, narrative, levels, balance)

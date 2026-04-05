@@ -1,0 +1,4 @@
+- 2026-04-05: Implemented `IPooledObject`, `PoolOverflowPolicy`, `ObjectPool<T>`, and `PoolConfigSO` under `KokTengri/Assets/Scripts/Core/`.
+- 2026-04-05: Wrote `ObjectPoolTests.cs` first to cover prewarm sizing, take/return lifecycle hooks, overflow behaviors (`Expand`, `ReturnNull`, `RecycleOldest`), and zero-allocation hot-path behavior.
+- 2026-04-05: Unity EditMode batch validation initially failed because `KokTengri.Tests.asmdef` was not configured as a discoverable test assembly. Fix was to use `optionalUnityReferences: ["TestAssemblies"]`, set `includePlatforms` to `Editor`, and remove the redundant explicit `UnityEngine.TestRunner` reference.
+- 2026-04-05: Verified in an isolated validation copy because the main `KokTengri` project was already open in Unity. Final batch run passed 19/19 EditMode tests, including 7 ObjectPool tests.
