@@ -1,9 +1,9 @@
-# Kök Tengri — Sprint 1 Tamamlandı
+# Kök Tengri — Sprint 1 Durum
 
-> **Son Güncelleme**: 2026-04-06 (Session 6 — Statik analiz tamamlandı)
-> **Mevcut Faz**: Pre-Production → Sprint 1 Implementation (Wave 4 tamamlandı, statik analiz geçti)
+> **Son Güncelleme**: 2026-04-06 (Unity compile check geçti)
+> **Mevcut Faz**: Pre-Production → Sprint 1 Verification (Wave 4 tamamlandı, statik analiz + compile check geçti)
 > **Hedef**: MVP-1 Sprint 1 tamamlama
-> **Sonraki Adım**: Unity editor'de compilation check → SpellDefinitionSO asset'leri oluştur → integration test
+> **Sonraki Adım**: SpellDefinitionSO asset'leri oluştur → integration test → Sprint 1 final verification
 
 ---
 
@@ -21,7 +21,7 @@
 | **Sprint 1 Wave 1-3 (S1-01 → S1-16)** | 100% | ✅ 31 .cs dosyası, 9 commit |
 | **Sprint 1 Wave 4 (S1-17, S1-18, S1-19)** | 100% | ✅ Tamamlandı (KayaKalkaniEffect + refactor + meta dosyaları) |
 | **Statik Analiz (cross-reference)** | 100% | ✅ 37 .cs dosyası — sıfır hata |
-| Build Verification | 0% | ⬜ Unity editor'de compilation check gerekli |
+| Build Verification | 100% | ✅ Unity editor açıldı, compile hatası yok |
 | SpellDefinitionSO Asset'leri | 0% | ⬜ Unity editor'de .asset oluşturulacak |
 | Integration Test | 0% | ⬜ Test senaryoları yazılacak |
 | Prototip | 0% | ⬜ Sprint sonrası |
@@ -64,6 +64,7 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | SpellCrafting.cs build hatası | ✅ SpellSlotEntry namespace seviyesine taşındı, `[Serializable]` eklendi |
 | .cs.meta dosyaları eksik | ✅ 6 .meta dosyası oluşturuldu |
 | LevelUpSelectionController tam nitelikli tip referansları | ✅ `SpellSlotManager.SpellSlotEntry` → `SpellSlotEntry` kısa form |
+| EventBusTests constructor mismatch | ✅ 3 eski `PlayerDamagedEvent` test çağrısı 5 parametreli imzaya güncellendi |
 
 ---
 
@@ -85,10 +86,9 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 
 ## Sonraki Adımlar
 
-1. **Unity editor aç** → compilation check (C# hataları var mı?)
-2. **SpellDefinitionSO asset'leri oluştur** — tüm 15 büyü için .asset dosyaları (Unity editor'de)
-3. **Integration test** senaryoları yaz
-4. **Sprint 1 final verification** → `/gate-check`
+1. **SpellDefinitionSO asset'leri oluştur** — tüm 15 büyü için .asset dosyaları (Unity editor'de)
+2. **Integration test** senaryoları yaz
+3. **Sprint 1 final verification** → `/gate-check`
 
 ---
 
@@ -117,6 +117,7 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | 2026-04-05 | Wave 4 kısmen tamamlandı | S1-17 Spell Effects (2/3 büyü), S1-18 HUD, S1-19 Level-Up Selection |
 | 2026-04-05 | Status güncellendi | active.md yazıldı |
 | 2026-04-05 | **Wave 4 tamamlandı** | KayaKalkaniEffect + SpellSlotEntry refactor + 6 .meta dosyası |
+| 2026-04-06 | **Unity compile clean** | EventBusTests içindeki eski `PlayerDamagedEvent` çağrıları güncellendi, proje hatasız açıldı |
 
 ---
 
@@ -139,4 +140,4 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 ---
 
 > **Yeni session'da kaldığın yeri bulmak için**: `production/session-state/active.md` dosyasını oku → "Yapılacak İşler" bölümüne bak → oradaki ilk görevden devam et.
-> **Şu anki sonraki adım**: Unity editor'de compilation check → SpellDefinitionSO asset'leri → integration test.
+> **Şu anki sonraki adım**: SpellDefinitionSO asset'leri → integration test → Sprint 1 final verification.
