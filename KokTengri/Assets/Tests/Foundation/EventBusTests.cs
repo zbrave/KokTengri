@@ -35,7 +35,7 @@ namespace KokTengri.Tests.Foundation
 
             EventBus.Subscribe<PlayerDamagedEvent>(Listener);
 
-            var published = new PlayerDamagedEvent(12, 88, 17, 1.25f);
+            var published = new PlayerDamagedEvent(12, 88, 100, 17, 1.25f);
             EventBus.Publish(published);
 
             Assert.That(wasCalled, Is.True);
@@ -58,7 +58,7 @@ namespace KokTengri.Tests.Foundation
             EventBus.Subscribe<PlayerDamagedEvent>(Listener);
             EventBus.Unsubscribe<PlayerDamagedEvent>(Listener);
 
-            EventBus.Publish(new PlayerDamagedEvent(4, 96, 2, 0.5f));
+            EventBus.Publish(new PlayerDamagedEvent(4, 96, 100, 2, 0.5f));
 
             Assert.That(callCount, Is.EqualTo(0));
         }
@@ -78,7 +78,7 @@ namespace KokTengri.Tests.Foundation
             EventBus.Subscribe<PlayerDamagedEvent>(ListenerTwo);
             EventBus.Subscribe<PlayerDamagedEvent>(ListenerThree);
 
-            EventBus.Publish(new PlayerDamagedEvent(9, 91, 8, 2f));
+            EventBus.Publish(new PlayerDamagedEvent(9, 91, 100, 8, 2f));
 
             Assert.That(listenerOneCalls, Is.EqualTo(1));
             Assert.That(listenerTwoCalls, Is.EqualTo(1));
@@ -98,7 +98,7 @@ namespace KokTengri.Tests.Foundation
             EventBus.Subscribe<PlayerDamagedEvent>(Second);
             EventBus.Subscribe<PlayerDamagedEvent>(Third);
 
-            EventBus.Publish(new PlayerDamagedEvent(1, 99, 5, 0.1f));
+            EventBus.Publish(new PlayerDamagedEvent(1, 99, 100, 5, 0.1f));
 
             CollectionAssert.AreEqual(new[] { "First", "Second", "Third" }, callOrder);
         }
@@ -128,7 +128,7 @@ namespace KokTengri.Tests.Foundation
             EventBus.Subscribe<PlayerDamagedEvent>(DamageListenerB);
             EventBus.Subscribe<XPCollectedEvent>(XpListener);
 
-            EventBus.Publish(new PlayerDamagedEvent(6, 72, 15, 2f));
+            EventBus.Publish(new PlayerDamagedEvent(6, 72, 100, 15, 2f));
 
             CollectionAssert.AreEqual(new[] { "damage-a", "damage-b", "xp" }, callOrder);
         }
@@ -189,7 +189,7 @@ namespace KokTengri.Tests.Foundation
             }
 
             channel.Subscribe(Listener);
-            channel.Publish(new PlayerDamagedEvent(7, 93, 4, 0.75f));
+            channel.Publish(new PlayerDamagedEvent(7, 93, 100, 4, 0.75f));
 
             Assert.That(wasCalled, Is.True);
         }
