@@ -1,7 +1,7 @@
 {
     "name": "KokTengri.Runtime",
     "rootNamespace": "KokTengri",
-    "references": ["Unity.InputSystem"],
+    "references": ["Unity.InputSystem", "Unity.TextMeshPro"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
