@@ -63,15 +63,31 @@ namespace KokTengri.Tests.Integration
         // --- EnemyDeath → XP Event Chain ---
 
         [Test]
-        public void EnemyDeathEvent_TriggersXpCollection()
+        public void EnemyDeathEvent_CarriesCorrectPayload()
         {
-            XPCollectedEvent receivedXp = default;
-            EventBus.Subscribe<XPCollectedEvent>(e => receivedXp = e);
+            EnemyDeathEvent received = default;
+            EventBus.Subscribe<EnemyDeathEvent>(e => received = e);
 
             EventBus.Publish(new EnemyDeathEvent(
-                42, EnemyType.KaraKurt, Vector3.zero, false, 5.2f));
+                42, EnemyType.KaraKurt, Vector3.zero, true, 5.2f));
 
-            Assert.That(receivedXp.Amount, Is.GreaterThan(0));
+            Assert.That(received.EnemyId, Is.EqualTo(42));
+            Assert.That(received.EnemyType, Is.EqualTo(EnemyType.KaraKurt));
+            Assert.That(received.IsElite, Is.True);
+            Assert.That(received.RunTime, Is.EqualTo(5.2f));
+        }
+
+        [Test]
+        public void XPCollectedEvent_CarriesCorrectPayload()
+        {
+            XPCollectedEvent received = default;
+            EventBus.Subscribe<XPCollectedEvent>(e => received = e);
+
+            EventBus.Publish(new XPCollectedEvent(25, 1, Vector3.one, 10.5f));
+
+            Assert.That(received.Amount, Is.EqualTo(25));
+            Assert.That(received.CollectorId, Is.EqualTo(1));
+            Assert.That(received.RunTime, Is.EqualTo(10.5f));
         }
 
         // --- Crafting Event Propagation ---
