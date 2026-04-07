@@ -1,0 +1,185 @@
+using System.Collections.Generic;
+using KokTengri.Core;
+using KokTengri.Gameplay;
+using NUnit.Framework;
+using UnityEngine;
+
+namespace KokTengri.Tests.Integration
+{
+    /// <summary>
+    /// Integration tests verifying EventBus-driven event flows between
+    /// Sprint 1 systems: Run lifecycle, XP gain, level-up, and spell crafting.
+    /// </summary>
+    [TestFixture]
+    public sealed class EventBusIntegrationTests
+    {
+        private readonly List<object> _publishedEvents = new();
+
+        [SetUp]
+        public void SetUp()
+        {
+            EventBus.Reset();
+            _publishedEvents.Clear();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            EventBus.Reset();
+        }
+
+        // --- Run Lifecycle Event Chain ---
+
+        [Test]
+        public void RunStartEvent_ReachesMultipleSubscribers()
+        {
+            var receivedByA = false;
+            var receivedByB = false;
+
+            EventBus.Subscribe<RunStartEvent>(e => receivedByA = true);
+            EventBus.Subscribe<RunStartEvent>(e => receivedByB = true);
+
+            EventBus.Publish(new RunStartEvent("kam_01", "Kam", 42));
+
+            Assert.That(receivedByA, Is.True);
+            Assert.That(receivedByB, Is.True);
+        }
+
+        [Test]
+        public void RunEndEvent_CarriesCorrectPayload()
+        {
+            RunEndEvent received = default;
+            EventBus.Subscribe<RunEndEvent>(e => received = e);
+
+            EventBus.Publish(new RunEndEvent(true, 120, 42, 15, 2, 500f, 180.5f));
+
+            Assert.That(received.IsVictory, Is.True);
+            Assert.That(received.RunId, Is.EqualTo(42));
+            Assert.That(received.KillCount, Is.EqualTo(15));
+            Assert.That(received.BossesDefeated, Is.EqualTo(2));
+            Assert.That(received.GoldEarned, Is.EqualTo(500f));
+            Assert.That(received.RunTime, Is.EqualTo(180.5f));
+        }
+
+        // --- EnemyDeath → XP Event Chain ---
+
+        [Test]
+        public void EnemyDeathEvent_TriggersXpCollection()
+        {
+            XPCollectedEvent receivedXp = default;
+            EventBus.Subscribe<XPCollectedEvent>(e => receivedXp = e);
+
+            EventBus.Publish(new EnemyDeathEvent(
+                EnemyType.KaraKurt, Vector3.zero, 42, 5.2f));
+
+            Assert.That(receivedXp.XpAmount, Is.GreaterThan(0));
+        }
+
+        // --- Crafting Event Propagation ---
+
+        [Test]
+        public void SpellCraftedEvent_ReachesAllSubscribers()
+        {
+            var craftedReceived = false;
+            var craftedSpellId = string.Empty;
+
+            EventBus.Subscribe<SpellCraftedEvent>(e =>
+            {
+                craftedReceived = true;
+                craftedSpellId = e.SpellId;
+            });
+
+            EventBus.Publish(new SpellCraftedEvent("alev_halkasi", 1, SpellKind.Orbit));
+
+            Assert.That(craftedReceived, Is.True);
+            Assert.That(craftedSpellId, Is.EqualTo("alev_halkasi"));
+        }
+
+        [Test]
+        public void SpellUpgradedEvent_CarriesNewLevel()
+        {
+            SpellUpgradedEvent received = default;
+            EventBus.Subscribe<SpellUpgradedEvent>(e => received = e);
+
+            EventBus.Publish(new SpellUpgradedEvent("kilic_firtinasi", 3));
+
+            Assert.That(received.SpellId, Is.EqualTo("kilic_firtinasi"));
+            Assert.That(received.NewLevel, Is.EqualTo(3));
+        }
+
+        // --- Wave Events ---
+
+        [Test]
+        public void WaveCompletedEvent_CarriesWaveNumber()
+        {
+            WaveCompletedEvent received = default;
+            EventBus.Subscribe<WaveCompletedEvent>(e => received = e);
+
+            EventBus.Publish(new WaveCompletedEvent(5, 3.2f, 8, true));
+
+            Assert.That(received.WaveNumber, Is.EqualTo(5));
+            Assert.That(received.EnemiesCleared, Is.EqualTo(8));
+        }
+
+        [Test]
+        public void BossSpawnedEvent_ReachesSubscribers()
+        {
+            var bossReceived = false;
+            EventBus.Subscribe<BossSpawnedEvent>(e => bossReceived = true);
+
+            EventBus.Publish(new BossSpawnedEvent(EnemyType.Albasti, 3, 7.5f));
+
+            Assert.That(bossReceived, Is.True);
+        }
+
+        // --- Level Up Event Chain ---
+
+        [Test]
+        public void LevelUpEvent_CarriesLevelAndRunTime()
+        {
+            LevelUpEvent received = default;
+            EventBus.Subscribe<LevelUpEvent>(e => received = e);
+
+            EventBus.Publish(new LevelUpEvent(5, 2, 120f));
+
+            Assert.That(received.NewLevel, Is.EqualTo(5));
+            Assert.That(received.LevelsGained, Is.EqualTo(2));
+            Assert.That(received.RunTime, Is.EqualTo(120f));
+        }
+
+        // --- Event Isolation Between Types ---
+
+        [Test]
+        public void DifferentEventTypes_DoNotCrossContaminate()
+        {
+            var spellCraftedCount = 0;
+            var spellUpgradedCount = 0;
+
+            EventBus.Subscribe<SpellCraftedEvent>(e => spellCraftedCount++);
+            EventBus.Subscribe<SpellUpgradedEvent>(e => spellUpgradedCount++);
+
+            EventBus.Publish(new SpellCraftedEvent("alev_halkasi", 1, SpellKind.Orbit));
+            EventBus.Publish(new SpellUpgradedEvent("alev_halkasi", 2));
+            EventBus.Publish(new SpellCraftedEvent("kaya_kalkani", 1, SpellKind.Orbit));
+
+            Assert.That(spellCraftedCount, Is.EqualTo(2));
+            Assert.That(spellUpgradedCount, Is.EqualTo(1));
+        }
+
+        // --- FIFO Ordering ---
+
+        [Test]
+        public void Events_ProcessInFIFOOrder()
+        {
+            var order = new List<string>();
+
+            EventBus.Subscribe<RunStartEvent>(e => order.Add("start"));
+            EventBus.Subscribe<RunEndEvent>(e => order.Add("end"));
+
+            EventBus.Publish(new RunStartEvent("kam_01", "Kam", 1));
+            EventBus.Publish(new RunEndEvent(false, 30, 1, 5, 0, 100f, 60f));
+
+            Assert.That(order, Is.EqualTo(new[] { "start", "end" }));
+        }
+    }
+}
