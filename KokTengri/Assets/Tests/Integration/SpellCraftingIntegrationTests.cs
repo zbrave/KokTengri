@@ -136,13 +136,36 @@ namespace KokTengri.Tests.Integration
         }
 
         [Test]
-        public void ProcessSelection_SpellAtMaxLevel_BlockedByFullSlots()
+        public void ProcessSelection_SpellAtMaxLevel_ReturnsAddToInventory()
         {
             _inventory.TryAdd(ElementType.Od);
             var slotsWithMaxedSpell = CreateSlotsWithSpell("alev_halkasi", 5, SpellKind.Orbit);
 
             var result = _crafting.ProcessSelection(ElementType.Od, slotsWithMaxedSpell, _spellSlots.MaxSlots);
 
+            // Spell is owned at max level → upgrade skipped, new spell skipped (already owned),
+            // element goes back to inventory
+            Assert.That(result.Type, Is.EqualTo(CraftingResultType.AddToInventory));
+        }
+
+        [Test]
+        public void ProcessSelection_NewRecipeButAllSlotsFull_BlockedByFullSlots()
+        {
+            _inventory.TryAdd(ElementType.Od);
+            // Fill all 6 slots with different spells (NOT alev_halkasi)
+            var fullSlots = new List<SpellSlotEntry>
+            {
+                new SpellSlotEntry("kaya_kalkani", 1, SpellKind.Orbit),
+                new SpellSlotEntry("kilic_firtinasi", 1, SpellKind.Projectile),
+                new SpellSlotEntry("buz_ruzgari", 1, SpellKind.AoE),
+                new SpellSlotEntry("sifa_pinari", 1, SpellKind.Passive),
+                new SpellSlotEntry("ruzgar_kosusu", 1, SpellKind.Aura),
+                new SpellSlotEntry("demir_yagmuru", 1, SpellKind.AoE),
+            };
+
+            var result = _crafting.ProcessSelection(ElementType.Od, fullSlots, maxSpellSlots: 6);
+
+            // Recipe found (Od+Od=alev_halkasi), spell NOT owned, but no free slot
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.BlockedByFullSlots));
         }
 
