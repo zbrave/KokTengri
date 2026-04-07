@@ -92,9 +92,9 @@ namespace KokTengri.Tests.Integration
         // --- XP Multiplier ---
 
         [Test]
-        public void GetEliteXpMultiplier_WithDefaultConfig_Returns3x()
+        public void GetFinalXpMultiplier_EliteWithDefaultConfig_Returns3x()
         {
-            float xpMult = DifficultyScaling.GetEliteXpMultiplier(null);
+            float xpMult = DifficultyScaling.GetFinalXpMultiplier(true, null);
 
             Assert.That(xpMult, Is.EqualTo(3.0f).Within(0.001f));
         }

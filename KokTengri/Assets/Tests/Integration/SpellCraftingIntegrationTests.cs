@@ -48,7 +48,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Od);
 
-            var result = _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var result = _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.NewSpell));
             Assert.That(result.SpellId, Is.EqualTo("alev_halkasi"));
@@ -61,7 +61,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Od);
 
-            var result = _crafting.ProcessSelection(ElementType.Temur, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var result = _crafting.ProcessSelection(ElementType.Temur, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.NewSpell));
             Assert.That(result.SpellId, Is.EqualTo("kilic_firtinasi"));
@@ -73,7 +73,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Sub);
 
-            var result = _crafting.ProcessSelection(ElementType.Yel, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var result = _crafting.ProcessSelection(ElementType.Yel, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.NewSpell));
             Assert.That(result.SpellId, Is.EqualTo("buz_ruzgari"));
@@ -87,7 +87,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Od);
 
-            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(_inventory.OccupiedCount, Is.EqualTo(0));
             Assert.That(_inventory.HasFreeSlot, Is.True);
@@ -100,7 +100,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Od);
 
-            var preview = _crafting.EvaluateSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var preview = _crafting.EvaluateSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(preview.Type, Is.EqualTo(CraftingResultType.NewSpell));
             Assert.That(_inventory.OccupiedCount, Is.EqualTo(1));
@@ -112,7 +112,7 @@ namespace KokTengri.Tests.Integration
         public void ProcessSelection_SameRecipeTwice_UpgradesSpell()
         {
             _inventory.TryAdd(ElementType.Od);
-            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             _inventory.TryAdd(ElementType.Od);
             var slotsWithSpell = CreateSlotsWithSpell("alev_halkasi", 1, SpellKind.Orbit);
@@ -151,7 +151,7 @@ namespace KokTengri.Tests.Integration
         [Test]
         public void ProcessSelection_NoInventoryElement_AddsToInventory()
         {
-            var result = _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var result = _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.AddToInventory));
             Assert.That(_inventory.OccupiedCount, Is.EqualTo(1));
@@ -179,7 +179,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(elementA);
 
-            var result = _crafting.ProcessSelection(elementB, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            var result = _crafting.ProcessSelection(elementB, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(result.Type, Is.EqualTo(CraftingResultType.NewSpell));
             Assert.That(result.SpellId, Is.EqualTo(expectedSpellId));
@@ -193,7 +193,7 @@ namespace KokTengri.Tests.Integration
         {
             _inventory.TryAdd(ElementType.Od);
 
-            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
 
             Assert.That(_craftedEvents.Count, Is.EqualTo(1));
             Assert.That(_craftedEvents[0].SpellId, Is.EqualTo("alev_halkasi"));
@@ -205,7 +205,7 @@ namespace KokTengri.Tests.Integration
         public void ProcessSelection_UpgradeSpell_PublishesSpellUpgradedEvent()
         {
             _inventory.TryAdd(ElementType.Od);
-            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSlots(), _spellSlots.MaxSlots);
+            _crafting.ProcessSelection(ElementType.Od, _spellSlots.GetAllSpells(), _spellSlots.MaxSlots);
             _craftedEvents.Clear();
 
             _inventory.TryAdd(ElementType.Od);

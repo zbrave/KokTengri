@@ -7,7 +7,7 @@ namespace KokTengri.Tests.Integration
 {
     /// <summary>
     /// Integration tests for SpellSlotManager verifying slot lifecycle,
-    /// upgrade paths, and interaction with the crafting system.
+    /// upgrade paths, and query operations against the actual API.
     /// </summary>
     [TestFixture]
     public sealed class SpellSlotManagerIntegrationTests
@@ -41,29 +41,47 @@ namespace KokTengri.Tests.Integration
             Assert.That(_manager.SpellCount, Is.EqualTo(0));
         }
 
-        // --- Add Spell ---
+        // --- Create Spell ---
 
         [Test]
-        public void TryAddSpell_NewSpell_ReturnsTrue()
+        public void TryCreateSpell_NewSpell_ReturnsTrue()
         {
-            bool added = _manager.TryAddSpell("alev_halkasi", SpellKind.Orbit, out int slotIndex);
+            bool created = _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
 
-            Assert.That(added, Is.True);
-            Assert.That(slotIndex, Is.EqualTo(0));
+            Assert.That(created, Is.True);
             Assert.That(_manager.SpellCount, Is.EqualTo(1));
         }
 
         [Test]
-        public void TryAddSpell_MultipleSpells_FillsSequentialSlots()
+        public void TryCreateSpell_MultipleSpells_FillsSequentialSlots()
         {
-            _manager.TryAddSpell("alev_halkasi", SpellKind.Orbit, out int slot0);
-            _manager.TryAddSpell("kilic_firtinasi", SpellKind.Projectile, out int slot1);
-            _manager.TryAddSpell("kaya_kalkani", SpellKind.Orbit, out int slot2);
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
+            _manager.TryCreateSpell("kaya_kalkani", SpellKind.Orbit);
 
-            Assert.That(slot0, Is.EqualTo(0));
-            Assert.That(slot1, Is.EqualTo(1));
-            Assert.That(slot2, Is.EqualTo(2));
             Assert.That(_manager.SpellCount, Is.EqualTo(3));
+
+            var spell0 = _manager.GetSpellAt(0);
+            var spell1 = _manager.GetSpellAt(1);
+            var spell2 = _manager.GetSpellAt(2);
+
+            Assert.That(spell0.HasValue, Is.True);
+            Assert.That(spell0.Value.SpellId, Is.EqualTo("alev_halkasi"));
+            Assert.That(spell1.HasValue, Is.True);
+            Assert.That(spell1.Value.SpellId, Is.EqualTo("kilic_firtinasi"));
+            Assert.That(spell2.HasValue, Is.True);
+            Assert.That(spell2.Value.SpellId, Is.EqualTo("kaya_kalkani"));
+        }
+
+        [Test]
+        public void TryCreateSpell_DuplicateSpell_ReturnsFalse()
+        {
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
+
+            bool duplicate = _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
+
+            Assert.That(duplicate, Is.False);
+            Assert.That(_manager.SpellCount, Is.EqualTo(1));
         }
 
         // --- Upgrade Spell ---
@@ -71,82 +89,160 @@ namespace KokTengri.Tests.Integration
         [Test]
         public void TryUpgradeSpell_ExistingSpell_IncrementsLevel()
         {
-            _manager.TryAddSpell("alev_halkasi", SpellKind.Orbit, out _);
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
 
-            bool upgraded = _manager.TryUpgradeSpell("alev_halkasi", out int newLevel);
+            bool upgraded = _manager.TryUpgradeSpell("alev_halkasi");
 
             Assert.That(upgraded, Is.True);
-            Assert.That(newLevel, Is.EqualTo(2));
+            Assert.That(_manager.GetSpellLevel("alev_halkasi"), Is.EqualTo(2));
         }
 
         [Test]
         public void TryUpgradeSpell_AtMaxLevel_ReturnsFalse()
         {
-            _manager.TryAddSpell("alev_halkasi", SpellKind.Orbit, out _);
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
 
+            // Upgrade from level 1 to 5
             for (int i = 0; i < 4; i++)
             {
-                _manager.TryUpgradeSpell("alev_halkasi", out _);
+                _manager.TryUpgradeSpell("alev_halkasi");
             }
 
-            bool upgraded = _manager.TryUpgradeSpell("alev_halkasi", out int level);
+            Assert.That(_manager.GetSpellLevel("alev_halkasi"), Is.EqualTo(5));
+
+            // Try to go beyond max
+            bool upgraded = _manager.TryUpgradeSpell("alev_halkasi");
 
             Assert.That(upgraded, Is.False);
-            Assert.That(level, Is.EqualTo(5));
+            Assert.That(_manager.GetSpellLevel("alev_halkasi"), Is.EqualTo(5));
         }
 
-        // --- Remove Spell ---
-
         [Test]
-        public void TryRemoveSpell_ExistingSpell_FreesSlot()
+        public void TryUpgradeSpell_NonExistent_ReturnsFalse()
         {
-            _manager.TryAddSpell("alev_halkasi", SpellKind.Orbit, out _);
+            bool upgraded = _manager.TryUpgradeSpell("nonexistent_spell");
 
-            bool removed = _manager.TryRemoveSpell("alev_halkasi");
-
-            Assert.That(removed, Is.True);
-            Assert.That(_manager.SpellCount, Is.EqualTo(0));
-            Assert.That(_manager.HasFreeSlot, Is.True);
+            Assert.That(upgraded, Is.False);
         }
 
         // --- Query Spells ---
 
         [Test]
-        public void TryGetSpell_ExistingSpell_ReturnsEntry()
+        public void IsSpellOwned_ExistingSpell_ReturnsTrue()
         {
-            _manager.TryAddSpell("kilic_firtinasi", SpellKind.Projectile, out _);
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
 
-            bool found = _manager.TryGetSpell("kilic_firtinasi", out SpellSlotEntry entry);
-
-            Assert.That(found, Is.True);
-            Assert.That(entry.SpellId, Is.EqualTo("kilic_firtinasi"));
-            Assert.That(entry.Kind, Is.EqualTo(SpellKind.Projectile));
-            Assert.That(entry.Level, Is.EqualTo(1));
+            Assert.That(_manager.IsSpellOwned("kilic_firtinasi"), Is.True);
         }
 
         [Test]
-        public void TryGetSpell_NonExistent_ReturnsFalse()
+        public void IsSpellOwned_NonExistent_ReturnsFalse()
         {
-            bool found = _manager.TryGetSpell("nonexistent_spell", out _);
+            Assert.That(_manager.IsSpellOwned("nonexistent_spell"), Is.False);
+        }
 
-            Assert.That(found, Is.False);
+        [Test]
+        public void GetSpellLevel_ExistingSpell_ReturnsCurrentLevel()
+        {
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
+
+            Assert.That(_manager.GetSpellLevel("kilic_firtinasi"), Is.EqualTo(1));
+
+            _manager.TryUpgradeSpell("kilic_firtinasi");
+
+            Assert.That(_manager.GetSpellLevel("kilic_firtinasi"), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void GetSpellLevel_NonExistent_ReturnsZero()
+        {
+            Assert.That(_manager.GetSpellLevel("nonexistent_spell"), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetSpellAt_ValidIndex_ReturnsEntry()
+        {
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
+
+            var entry = _manager.GetSpellAt(0);
+
+            Assert.That(entry.HasValue, Is.True);
+            Assert.That(entry.Value.SpellId, Is.EqualTo("kilic_firtinasi"));
+            Assert.That(entry.Value.Kind, Is.EqualTo(SpellKind.Projectile));
+            Assert.That(entry.Value.Level, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void GetSpellAt_EmptyIndex_ReturnsNull()
+        {
+            var entry = _manager.GetSpellAt(0);
+
+            Assert.That(entry.HasValue, Is.False);
+        }
+
+        [Test]
+        public void GetSpellAt_InvalidIndex_ReturnsNull()
+        {
+            var entry = _manager.GetSpellAt(-1);
+            Assert.That(entry.HasValue, Is.False);
+
+            entry = _manager.GetSpellAt(99);
+            Assert.That(entry.HasValue, Is.False);
+        }
+
+        // --- GetAllSpells ---
+
+        [Test]
+        public void GetAllSpells_Empty_ReturnsEmptyList()
+        {
+            var spells = _manager.GetAllSpells();
+
+            Assert.That(spells.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetAllSpells_WithSpells_ReturnsOrderedSnapshot()
+        {
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
+
+            var spells = _manager.GetAllSpells();
+
+            Assert.That(spells.Count, Is.EqualTo(2));
+            Assert.That(spells[0].SpellId, Is.EqualTo("alev_halkasi"));
+            Assert.That(spells[1].SpellId, Is.EqualTo("kilic_firtinasi"));
         }
 
         // --- Full Slots Scenario ---
 
         [Test]
-        public void TryAddSpell_WhenAllSlotsFull_ReturnsFalse()
+        public void TryCreateSpell_WhenAllSlotsFull_ReturnsFalse()
         {
             var smallManager = new SpellSlotManager(maxSlots: 2, maxLevel: 5);
 
-            smallManager.TryAddSpell("spell_a", SpellKind.AoE, out _);
-            smallManager.TryAddSpell("spell_b", SpellKind.Projectile, out _);
+            smallManager.TryCreateSpell("spell_a", SpellKind.AoE);
+            smallManager.TryCreateSpell("spell_b", SpellKind.Projectile);
 
-            bool added = smallManager.TryAddSpell("spell_c", SpellKind.Orbit, out _);
+            bool added = smallManager.TryCreateSpell("spell_c", SpellKind.Orbit);
 
             Assert.That(added, Is.False);
             Assert.That(smallManager.SpellCount, Is.EqualTo(2));
             Assert.That(smallManager.HasFreeSlot, Is.False);
+        }
+
+        // --- Clear ---
+
+        [Test]
+        public void Clear_RemovesAllSpells()
+        {
+            _manager.TryCreateSpell("alev_halkasi", SpellKind.Orbit);
+            _manager.TryCreateSpell("kilic_firtinasi", SpellKind.Projectile);
+
+            _manager.Clear();
+
+            Assert.That(_manager.SpellCount, Is.EqualTo(0));
+            Assert.That(_manager.HasFreeSlot, Is.True);
+            Assert.That(_manager.IsSpellOwned("alev_halkasi"), Is.False);
         }
     }
 }

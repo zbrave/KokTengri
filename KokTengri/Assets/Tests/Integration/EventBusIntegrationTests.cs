@@ -39,7 +39,7 @@ namespace KokTengri.Tests.Integration
             EventBus.Subscribe<RunStartEvent>(e => receivedByA = true);
             EventBus.Subscribe<RunStartEvent>(e => receivedByB = true);
 
-            EventBus.Publish(new RunStartEvent("kam_01", "Kam", 42));
+            EventBus.Publish(new RunStartEvent(1, "kam_01", "Kam", 42));
 
             Assert.That(receivedByA, Is.True);
             Assert.That(receivedByB, Is.True);
@@ -51,14 +51,13 @@ namespace KokTengri.Tests.Integration
             RunEndEvent received = default;
             EventBus.Subscribe<RunEndEvent>(e => received = e);
 
-            EventBus.Publish(new RunEndEvent(true, 120, 42, 15, 2, 500f, 180.5f));
+            EventBus.Publish(new RunEndEvent(42, RunEndResultType.Victory, 180.5f, 15, 2));
 
-            Assert.That(received.IsVictory, Is.True);
+            Assert.That(received.Result, Is.EqualTo(RunEndResultType.Victory));
             Assert.That(received.RunId, Is.EqualTo(42));
-            Assert.That(received.KillCount, Is.EqualTo(15));
+            Assert.That(received.Kills, Is.EqualTo(15));
             Assert.That(received.BossesDefeated, Is.EqualTo(2));
-            Assert.That(received.GoldEarned, Is.EqualTo(500f));
-            Assert.That(received.RunTime, Is.EqualTo(180.5f));
+            Assert.That(received.SurvivedSeconds, Is.EqualTo(180.5f));
         }
 
         // --- EnemyDeath → XP Event Chain ---
@@ -70,9 +69,9 @@ namespace KokTengri.Tests.Integration
             EventBus.Subscribe<XPCollectedEvent>(e => receivedXp = e);
 
             EventBus.Publish(new EnemyDeathEvent(
-                EnemyType.KaraKurt, Vector3.zero, 42, 5.2f));
+                42, EnemyType.KaraKurt, Vector3.zero, false, 5.2f));
 
-            Assert.That(receivedXp.XpAmount, Is.GreaterThan(0));
+            Assert.That(receivedXp.Amount, Is.GreaterThan(0));
         }
 
         // --- Crafting Event Propagation ---
@@ -115,10 +114,10 @@ namespace KokTengri.Tests.Integration
             WaveCompletedEvent received = default;
             EventBus.Subscribe<WaveCompletedEvent>(e => received = e);
 
-            EventBus.Publish(new WaveCompletedEvent(5, 3.2f, 8, true));
+            EventBus.Publish(new WaveCompletedEvent(5, 8, 3.2f));
 
-            Assert.That(received.WaveNumber, Is.EqualTo(5));
-            Assert.That(received.EnemiesCleared, Is.EqualTo(8));
+            Assert.That(received.WaveIndex, Is.EqualTo(5));
+            Assert.That(received.RemainingEnemies, Is.EqualTo(8));
         }
 
         [Test]
@@ -127,7 +126,7 @@ namespace KokTengri.Tests.Integration
             var bossReceived = false;
             EventBus.Subscribe<BossSpawnedEvent>(e => bossReceived = true);
 
-            EventBus.Publish(new BossSpawnedEvent(EnemyType.Albasti, 3, 7.5f));
+            EventBus.Publish(new BossSpawnedEvent("albasti", Vector3.zero, 7.5f));
 
             Assert.That(bossReceived, Is.True);
         }
@@ -140,10 +139,10 @@ namespace KokTengri.Tests.Integration
             LevelUpEvent received = default;
             EventBus.Subscribe<LevelUpEvent>(e => received = e);
 
-            EventBus.Publish(new LevelUpEvent(5, 2, 120f));
+            EventBus.Publish(new LevelUpEvent(5, 0f, 120f));
 
             Assert.That(received.NewLevel, Is.EqualTo(5));
-            Assert.That(received.LevelsGained, Is.EqualTo(2));
+            Assert.That(received.OverflowXp, Is.EqualTo(0f));
             Assert.That(received.RunTime, Is.EqualTo(120f));
         }
 
@@ -176,8 +175,8 @@ namespace KokTengri.Tests.Integration
             EventBus.Subscribe<RunStartEvent>(e => order.Add("start"));
             EventBus.Subscribe<RunEndEvent>(e => order.Add("end"));
 
-            EventBus.Publish(new RunStartEvent("kam_01", "Kam", 1));
-            EventBus.Publish(new RunEndEvent(false, 30, 1, 5, 0, 100f, 60f));
+            EventBus.Publish(new RunStartEvent(1, "kam_01", "Kam", 1));
+            EventBus.Publish(new RunEndEvent(1, RunEndResultType.Defeat, 60f, 5, 0));
 
             Assert.That(order, Is.EqualTo(new[] { "start", "end" }));
         }
