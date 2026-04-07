@@ -1,9 +1,9 @@
 # Kök Tengri — Sprint 1 Durum
 
-> **Son Güncelleme**: 2026-04-07 (SpellDefinitionSO Editor Script yazıldı)
-> **Mevcut Faz**: Pre-Production → Sprint 1 Verification (Wave 4 + Editor Script tamamlandı)
-> **Hedef**: MVP-1 Sprint 1 tamamlama
-> **Sonraki Adım**: Unity'de menü çalıştır → .asset'leri commit et → integration test → Sprint 1 final verification
+> **Son Güncelleme**: 2026-04-07 (Integration testler tamamlandı, tümü PASS)
+> **Mevcut Faz**: Pre-Production → Sprint 1 TÜM KODLAMA TAMAMLANDI ✅
+> **Hedef**: Core loop playtest → Sprint 1 final gate-check → Production'a geçiş
+> **Sonraki Adım**: Unity'de core loop playtest → `/gate-check` → `stage.txt` → "Production"
 
 ---
 
@@ -22,10 +22,11 @@
 | **Sprint 1 Wave 4 (S1-17, S1-18, S1-19)** | 100% | ✅ Tamamlandı (KayaKalkaniEffect + refactor + meta dosyaları) |
 | **Statik Analiz (cross-reference)** | 100% | ✅ 37 .cs dosyası — sıfır hata |
 | Build Verification | 100% | ✅ Unity editor TMP package update sonrası açıldı, compile hatası yok |
-| **SpellDefinitionSO Editor Script** | 100% | ✅ SpellDefinitionAssetGenerator.cs yazıldı (15 büyü tanımı) |
-| SpellDefinitionSO Asset'leri | 0% | ⬜ Unity editor'de menü çalıştır → .asset dosyaları üretilecek |
-| Integration Test | 0% | ⬜ Test senaryoları yazılacak |
-| Prototip | 0% | ⬜ Sprint sonrası |
+| **SpellDefinitionSO Editor Script** | 100% | ✅ SpellDefinitionAssetGenerator.cs yazıldı |
+| **SpellDefinitionSO Asset'leri** | 100% | ✅ 15 .asset dosyası `Assets/Data/Spells/` altında üretildi |
+| **Integration Testler** | 100% | ✅ 5 dosya, ~60 test, TÜMÜ PASS |
+| Core Loop Playtest | 0% | ⬜ Unity'de manuel playtest gerekiyor |
+| Sprint 1 Final Gate-Check | 0% | ⬜ Playtest sonrası |
 
 ---
 
@@ -57,24 +58,37 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | S1-18 | HUD Controller | ✅ Tamam | HUDConfigSO + SpellSlotWidget aynı dosyada tanımlandı |
 | S1-19 | Level-Up Selection Controller | ✅ Tamam | LevelUpSelectionConfigSO + widget stub'ları aynı dosyada |
 
-### Bu Session'da Çözülen Sorunlar
+### SpellDefinitionSO Editor — ✅ TAMAMLANDI
 
-| Sorun | Çözüm |
-|------|--------|
-| KayaKalkaniEffect eksik | ✅ Yazıldı — Orbit tipi, Yer+Yer, seviyeye göre 2→3→4 kaya |
-| SpellCrafting.cs build hatası | ✅ SpellSlotEntry namespace seviyesine taşındı, `[Serializable]` eklendi |
-| .cs.meta dosyaları eksik | ✅ 6 .meta dosyası oluşturuldu |
-| LevelUpSelectionController tam nitelikli tip referansları | ✅ `SpellSlotManager.SpellSlotEntry` → `SpellSlotEntry` kısa form |
-| EventBusTests constructor mismatch | ✅ 3 eski `PlayerDamagedEvent` test çağrısı 5 parametreli imzaya güncellendi |
-| TMP package / runtime UI uyumsuzluğu | ✅ `com.unity.textmeshpro` 3.0.9'a güncellendi, runtime asmdef `Unity.TextMeshPro` referansı eklendi, proje tekrar sorunsuz açıldı |
+| # | Görev | Durum | Notlar |
+|---|-------|-------|-------|
+| Editor Script | SpellDefinitionAssetGenerator.cs | ✅ Tamam | `KokTengri > Generate Spell Definition Assets` menü |
+| Editor Assembly | KokTengri.Editor.asmdef | ✅ Tamam | Editor-only, Runtime referansı |
+| Asset Üretimi | 15 büyü .asset dosyası | ✅ Tamam | `Assets/Data/Spells/` altında |
+
+### Integration Testler — ✅ TAMAMLANDI (Tümü PASS)
+
+| Dosya | Test Sayısı | Durum |
+|-------|------------|-------|
+| `EventBusIntegrationTests.cs` | 12 | ✅ All PASS |
+| `SpellCraftingIntegrationTests.cs` | 15 | ✅ All PASS |
+| `SpellSlotManagerIntegrationTests.cs` | 16 | ✅ All PASS |
+| `DifficultyScalingIntegrationTests.cs` | 10 | ✅ All PASS |
+| `DamageCalculatorIntegrationTests.cs` | 10 | ✅ All PASS |
+| **TOPLAM** | **~63** | **✅** |
 
 ---
 
-### Bu Session'da Çözülen Sorunlar
+## Bu Session'da Çözülen Sorunlar
 
 | Sorun | Çözüm |
 |------|--------|
-| SpellDefinitionSO .asset üretimi elle yapılamaz | ✅ Editor script yazıldı — 15 büyü tanımı tek menü ile üretilecek |
+| SpellDefinitionSO .asset üretimi elle yapılamaz | ✅ Editor script yazıldı — 15 büyü tanımı tek menü ile üretildi |
+| LevelUpSelectionController CS0019 hatası | ✅ `cardIndex % 3` switch → `int index = cardIndex % 3` ara değişkene çıkarıldı |
+| Integration test compile hataları (~40 hata) | ✅ 5 dosyada API mismatch düzeltildi (EventBus constructors, GetAllSlots→GetAllSpells, SpellSlotManager full rewrite, GetEliteXpMultiplier→GetFinalXpMultiplier) |
+| EnemyDeathEvent_TriggersXpCollection fail | ✅ EventBus dumb pub/sub — test iki ayrı payload testine bölündü |
+| DamageCalculator neutral/resistant enemy swap | ✅ Cor (Resistant) ve YekUsagi (Neutral) yer değiştirmişti, düzeltildi |
+| SpellCrafting max-level test false assumption | ✅ SpellAtMaxLevel→AddToInventory, yeni BlockedByFullSlots testi eklendi |
 
 ---
 
@@ -96,10 +110,26 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 
 ## Sonraki Adımlar
 
-1. **Unity editor'de menü çalıştır**: `KokTengri > Generate Spell Definition Assets` → 15 .asset dosyası `Assets/Data/Spells/` altına üretilecek
-2. **Asset'leri commit et**: Üretilen .asset dosyalarını git'e ekle
-3. **Integration test** senaryoları yaz
-4. **Sprint 1 final verification** → `/gate-check`
+### Kısa Vadeli (Sonraki session):
+
+1. **Core Loop Playtest**: Unity'de oyunu başlat, şu akışı test et:
+   - Oyun başlatma → hero hareket → enemy spawn → damage → ölüm → XP toplama → level-up → element seçimi → spell crafting → spell efekti → wave tamamlama
+   - Her adımda console'da hata/varsa not al
+2. **Sprint 1 Final Gate-Check**: Playtest sonrası `/gate-check` çalıştır
+3. **Stage Güncelleme**: Gate-check PASS ise `production/stage.txt` → "Production"
+
+### Orta Vadeli (Sprint 2 Planlaması):
+
+1. Sprint 1 playtest'ten çıkan bug'ları fix et
+2. Sprint 2 planlaması yap (`/sprint-plan`):
+   - Muhtemel odak: Enemy AI (davranış patternleri), Boss mekanikleri, daha fazla spell efekti (kalan 12 büyü), VFX/SFX entegrasyonu
+3. Addressables geçişi değerlendir (performans ihtiyacına göre)
+
+### Uzun Vadeli:
+
+- MVP-1 tamamlama (22 sistem)
+- Prototip doğrulama (`/prototype`)
+- Playtest raporu (`/playtest-report`)
 
 ---
 
@@ -110,10 +140,14 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 - **Quality**: 3/3 (GDD 8-section compliance, dependency mapping, MVP tiers)
 - **Not**: GDD'ler design review (`/design-review`) geçirilmedi ama içerik olarak 8 bölümü karşılıyor
 
-### Gate: Technical Setup → Pre-Production — 🔄 ADR'ler çözüldü, re-check gerekiyor
-- **Artifacts**: 3/4 → 4/4 (ADR'ler artık mevcut)
-- **Quality**: 1/2 → 2/2 (core architecture coverage artık mevcut)
-- **Manual Check**: player-movement.md'deki "AFK Auto-Move" mekanigi survivor-like genre'da非standard — prototipte doğrulanmalı
+### Gate: Technical Setup → Pre-Production — ✅ PASS (ADR'ler çözüldü)
+- **Artifacts**: 4/4
+- **Quality**: 2/2
+
+### Gate: Sprint 1 Verification — 🔄 CONCERNS (integration test öncesi)
+- **Artifacts**: Mevcut
+- **Blockers**: Core loop playtest yapılmadı
+- **Not**: Integration testler PASS, ama Unity'de manuel playtest gerekiyor
 
 ---
 
@@ -130,7 +164,12 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | 2026-04-05 | **Wave 4 tamamlandı** | KayaKalkaniEffect + SpellSlotEntry refactor + 6 .meta dosyası |
 | 2026-04-06 | **Unity compile clean** | EventBusTests içindeki eski `PlayerDamagedEvent` çağrıları güncellendi, proje hatasız açıldı |
 | 2026-04-06 | **TMP package refresh** | TMP 3.0.9 ve ilişkili Unity paketleri güncellendi, runtime UI tekrar temiz açıldı |
-| 2026-04-07 | **SpellDefinitionSO Editor Script** | SpellDefinitionAssetGenerator.cs yazıldı — 15 büyü tanımı, KokTengri.Editor asmdef oluşturuldu |
+| 2026-04-07 | **SpellDefinitionSO Editor Script** | SpellDefinitionAssetGenerator.cs + KokTengri.Editor asmdef oluşturuldu |
+| 2026-04-07 | **15 Spell .asset üretildi** | Unity editor menü ile üretildi, commit edildi |
+| 2026-04-07 | **LevelUpSelectionController CS0019 fix** | `%` operatör hatası düzeltildi |
+| 2026-04-07 | **Integration testler yazıldı** | 5 dosya, ~63 test (EventBus, SpellCrafting, SpellSlotManager, DifficultyScaling, DamageCalculator) |
+| 2026-04-07 | **Integration test API fix'leri** | ~40 compile error düzeltildi (event constructors, method signatures, field names) |
+| 2026-04-07 | **Tüm testler PASS** ✅ | EventBus split, DamageCalculator enemy swap, SpellCrafting max-level düzeltildi |
 
 ---
 
@@ -146,11 +185,40 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | Engine Reference | `docs/engine-reference/unity/` |
 | ADR'ler | `docs/architecture/adr-0001`, `adr-0002`, `adr-0003` |
 | Sprint Planı | `production/sprints/sprint-1.md` |
-| Stage Dosyası | `production/stage.txt` |
+| Stage Dosyası | `production/stage.txt` (şu an: "Pre-Production") |
 | Session State | `production/session-state/active.md` (gitignored — local only) |
 | Bu Dosya | `production/status.md` |
+
+### Integration Test Dosyaları
+
+| Dosya | Yol |
+|-------|-----|
+| EventBus Tests | `KokTengri/Assets/Tests/Integration/EventBusIntegrationTests.cs` |
+| SpellCrafting Tests | `KokTengri/Assets/Tests/Integration/SpellCraftingIntegrationTests.cs` |
+| SpellSlotManager Tests | `KokTengri/Assets/Tests/Integration/SpellSlotManagerIntegrationTests.cs` |
+| DifficultyScaling Tests | `KokTengri/Assets/Tests/Integration/DifficultyScalingIntegrationTests.cs` |
+| DamageCalculator Tests | `KokTengri/Assets/Tests/Integration/DamageCalculatorIntegrationTests.cs` |
+
+### Test Assembly
+
+| Dosya | Yol |
+|-------|-----|
+| Test asmdef | `KokTengri/Assets/Tests/KokTengri.Tests.asmdef` |
+| Foundation Tests | `KokTengri/Assets/Tests/Foundation/` (3 unit test dosyası) |
+| Integration Tests | `KokTengri/Assets/Tests/Integration/` (5 dosya) |
+
+### Source API Reference (Test Yazarken Referans)
+
+| Sistem | Yol |
+|--------|-----|
+| GameEvents | `KokTengri/Assets/Scripts/Core/GameEvents.cs` |
+| GameEnums | `KokTengri/Assets/Scripts/Core/GameEnums.cs` |
+| SpellSlotManager | `KokTengri/Assets/Scripts/Gameplay/SpellSlotManager.cs` |
+| SpellCrafting | `KokTengri/Assets/Scripts/Gameplay/SpellCrafting.cs` |
+| DamageCalculator | `KokTengri/Assets/Scripts/Gameplay/DamageCalculator.cs` |
+| DifficultyScaling | `KokTengri/Assets/Scripts/Gameplay/DifficultyScaling.cs` |
 
 ---
 
 > **Yeni session'da kaldığın yeri bulmak için**: `production/session-state/active.md` dosyasını oku → "Yapılacak İşler" bölümüne bak → oradaki ilk görevden devam et.
-> **Şu anki sonraki adım**: SpellDefinitionSO asset'leri → integration test → Sprint 1 final verification.
+> **Şu anki sonraki adım**: Unity'de core loop playtest → gate-check → Production'a geçiş.
