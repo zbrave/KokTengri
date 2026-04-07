@@ -1,9 +1,9 @@
 # Kök Tengri — Sprint 1 Durum
 
-> **Son Güncelleme**: 2026-04-06 (TMP package update + clean reopen)
-> **Mevcut Faz**: Pre-Production → Sprint 1 Verification (Wave 4 tamamlandı, statik analiz + TMP restore + compile check geçti)
+> **Son Güncelleme**: 2026-04-07 (SpellDefinitionSO Editor Script yazıldı)
+> **Mevcut Faz**: Pre-Production → Sprint 1 Verification (Wave 4 + Editor Script tamamlandı)
 > **Hedef**: MVP-1 Sprint 1 tamamlama
-> **Sonraki Adım**: SpellDefinitionSO asset'leri oluştur → integration test → Sprint 1 final verification
+> **Sonraki Adım**: Unity'de menü çalıştır → .asset'leri commit et → integration test → Sprint 1 final verification
 
 ---
 
@@ -22,7 +22,8 @@
 | **Sprint 1 Wave 4 (S1-17, S1-18, S1-19)** | 100% | ✅ Tamamlandı (KayaKalkaniEffect + refactor + meta dosyaları) |
 | **Statik Analiz (cross-reference)** | 100% | ✅ 37 .cs dosyası — sıfır hata |
 | Build Verification | 100% | ✅ Unity editor TMP package update sonrası açıldı, compile hatası yok |
-| SpellDefinitionSO Asset'leri | 0% | ⬜ Unity editor'de .asset oluşturulacak |
+| **SpellDefinitionSO Editor Script** | 100% | ✅ SpellDefinitionAssetGenerator.cs yazıldı (15 büyü tanımı) |
+| SpellDefinitionSO Asset'leri | 0% | ⬜ Unity editor'de menü çalıştır → .asset dosyaları üretilecek |
 | Integration Test | 0% | ⬜ Test senaryoları yazılacak |
 | Prototip | 0% | ⬜ Sprint sonrası |
 
@@ -69,6 +70,14 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 
 ---
 
+### Bu Session'da Çözülen Sorunlar
+
+| Sorun | Çözüm |
+|------|--------|
+| SpellDefinitionSO .asset üretimi elle yapılamaz | ✅ Editor script yazıldı — 15 büyü tanımı tek menü ile üretilecek |
+
+---
+
 ### Statik Analiz — ✅ TAMAMLANDI (Session 6, 2026-04-06)
 
 37 C# dosyasının tamamı manuel cross-reference analizi ile kontrol edildi:
@@ -87,9 +96,10 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 
 ## Sonraki Adımlar
 
-1. **SpellDefinitionSO asset'leri oluştur** — tüm 15 büyü için .asset dosyaları (Unity editor'de)
-2. **Integration test** senaryoları yaz
-3. **Sprint 1 final verification** → `/gate-check`
+1. **Unity editor'de menü çalıştır**: `KokTengri > Generate Spell Definition Assets` → 15 .asset dosyası `Assets/Data/Spells/` altına üretilecek
+2. **Asset'leri commit et**: Üretilen .asset dosyalarını git'e ekle
+3. **Integration test** senaryoları yaz
+4. **Sprint 1 final verification** → `/gate-check`
 
 ---
 
@@ -120,6 +130,7 @@ Altyapı: EventBus, GenericObjectPool, IInputProvider, tüm Data SO'ları, GameE
 | 2026-04-05 | **Wave 4 tamamlandı** | KayaKalkaniEffect + SpellSlotEntry refactor + 6 .meta dosyası |
 | 2026-04-06 | **Unity compile clean** | EventBusTests içindeki eski `PlayerDamagedEvent` çağrıları güncellendi, proje hatasız açıldı |
 | 2026-04-06 | **TMP package refresh** | TMP 3.0.9 ve ilişkili Unity paketleri güncellendi, runtime UI tekrar temiz açıldı |
+| 2026-04-07 | **SpellDefinitionSO Editor Script** | SpellDefinitionAssetGenerator.cs yazıldı — 15 büyü tanımı, KokTengri.Editor asmdef oluşturuldu |
 
 ---
 

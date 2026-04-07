@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d669a8461430a4347ad25716a2699416, type: 3}
+  m_Name: SpellDefinition_ruzgar_kosusu
+  m_EditorClassIdentifier: 
+  <SpellId>k__BackingField: ruzgar_kosusu
+  <DisplayName>k__BackingField: "R\xFCzgar Ko\u015Fusu"
+  <Kind>k__BackingField: 3
+  <BaseDamage>k__BackingField: 5
+  <MaxLevel>k__BackingField: 5
+  <ElementA>k__BackingField: 3
+  <ElementB>k__BackingField: 3
+  <DamageScalingPerLevel>k__BackingField: 0.25
+  <CooldownSeconds>k__BackingField: 0.5
+  <DurationSeconds>k__BackingField: 0
+  <Range>k__BackingField: 3
+  <AreaRadius>k__BackingField: 2
+  <ProjectileCount>k__BackingField: 1
+  <Speed>k__BackingField: 1
