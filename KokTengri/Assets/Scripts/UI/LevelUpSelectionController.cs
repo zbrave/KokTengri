@@ -552,7 +552,9 @@ namespace KokTengri.UI
 
         private static FallbackRewardType GetFallbackReward(int cardIndex)
         {
-            return cardIndex % 3 switch
+            int index = cardIndex % 3;
+
+            return index switch
             {
                 0 => FallbackRewardType.Health,
                 1 => FallbackRewardType.Speed,
