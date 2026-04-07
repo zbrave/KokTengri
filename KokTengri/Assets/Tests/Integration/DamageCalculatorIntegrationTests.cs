@@ -55,7 +55,7 @@ namespace KokTengri.Tests.Integration
                 baseDamage: 10f,
                 spellLevel: 1,
                 spellElement: ElementType.Od,
-                targetEnemyType: EnemyType.YekUsagi,
+                targetEnemyType: EnemyType.Cor,
                 heroClass: HeroClass.None);
 
             // affinity[0,3] = 0.6 (Resistant)
@@ -70,7 +70,7 @@ namespace KokTengri.Tests.Integration
                 baseDamage: 20f,
                 spellLevel: 2,
                 spellElement: ElementType.Od,
-                targetEnemyType: EnemyType.Cor,
+                targetEnemyType: EnemyType.YekUsagi,
                 heroClass: HeroClass.None);
 
             // affinity[0,1] = 1.0 (Neutral), level = 1 + 0.25*(2-1) = 1.25
